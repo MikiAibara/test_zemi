@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>性格診断 — あなたの本当の強みを見つけよう</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -17,142 +17,158 @@
   --gray-dark:#2A2A2A;
   --gray-mid:#888;
 }
-html,body{
+html{
   height:100%;
+  height: -webkit-fill-available;
+}
+body{
+  min-height:100vh;
+  min-height: -webkit-fill-available;
   font-family:'Noto Sans JP',sans-serif;
-  background:#e8e7e3;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding:24px 0 48px;
-}
-.phone{
-  width:100%;
-  max-width:390px;
   background:var(--gray-bg);
-  min-height:700px;
-  border-radius:40px;
-  overflow:hidden;
-  position:relative;
-  box-shadow:0 24px 64px rgba(0,0,0,0.12);
+  margin:0;
+  padding:0;
+  overflow-x:hidden;
 }
-@media(max-width:430px){
-  html,body{padding:0;background:var(--gray-bg)}
-  .phone{border-radius:0;box-shadow:none;min-height:100vh}
+/* スクロール可能なラッパー */
+#app{
+  width:100%;
+  min-height:100vh;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
 }
+/* 背景の水玉（固定） */
 .blob-wrap{
-  position:absolute;width:100%;height:100%;
-  top:0;left:0;pointer-events:none;overflow:hidden;
-  border-radius:40px;z-index:0;
+  position:fixed;
+  width:100%;
+  height:100%;
+  top:0;left:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
 }
 .dot-circle{position:absolute;border-radius:50%}
-.hdr{padding:52px 28px 20px;position:relative;z-index:2}
+/* コンテンツ全体 */
+.screen{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:480px;
+  margin:0 auto;
+  padding-bottom:env(safe-area-inset-bottom, 24px);
+}
+.hdr{
+  padding:max(52px, calc(44px + env(safe-area-inset-top))) 24px 20px;
+}
 .app-tag{
   display:inline-block;font-size:11px;font-weight:700;
   letter-spacing:0.15em;color:var(--gray-dark);
   background:var(--lime);padding:4px 12px;border-radius:20px;margin-bottom:16px;
 }
-.hdr-title{font-size:32px;font-weight:900;color:var(--gray-dark);line-height:1.25;letter-spacing:-0.02em}
+.hdr-title{
+  font-size:clamp(26px,7vw,34px);font-weight:900;
+  color:var(--gray-dark);line-height:1.25;letter-spacing:-0.02em;
+}
 .hdr-sub{font-size:13px;color:var(--gray-mid);margin-top:10px;line-height:1.6}
-.prog-wrap{padding:0 28px 20px;position:relative;z-index:2}
+.prog-wrap{padding:0 24px 20px}
 .prog-dots{display:flex;gap:6px;align-items:center}
 .dot{width:8px;height:8px;border-radius:4px;background:var(--gray-card);transition:all 0.3s}
 .dot.active{width:24px;background:var(--gray-dark)}
 .dot.done{background:var(--lime)}
 .q-card{
-  margin:0 20px 16px;background:#fff;border-radius:28px;
-  padding:28px 24px 24px;position:relative;z-index:2;
+  margin:0 16px 14px;background:#fff;border-radius:24px;
+  padding:24px 20px 22px;
 }
-.q-num{font-size:11px;font-weight:700;letter-spacing:0.15em;color:var(--gray-mid);margin-bottom:12px}
-.q-text{font-size:17px;font-weight:700;color:var(--gray-dark);line-height:1.6}
+.q-num{font-size:11px;font-weight:700;letter-spacing:0.15em;color:var(--gray-mid);margin-bottom:10px}
+.q-text{font-size:clamp(15px,4.5vw,18px);font-weight:700;color:var(--gray-dark);line-height:1.6}
 .opts{
-  padding:0 20px 32px;
+  padding:0 16px 32px;
   display:flex;flex-direction:column;gap:10px;
-  position:relative;z-index:2;
 }
 .opt{
-  background:#fff;border:2px solid transparent;border-radius:20px;
-  padding:14px 18px;display:flex;align-items:center;gap:14px;
+  background:#fff;border:2px solid transparent;border-radius:18px;
+  padding:13px 16px;display:flex;align-items:center;gap:12px;
   cursor:pointer;transition:all 0.18s;
   font-family:'Noto Sans JP',sans-serif;text-align:left;width:100%;
 }
 .opt:active{transform:scale(0.97)}
 .opt.sel{border-color:var(--lime);background:#f7ffe0}
 .opt-ico{
-  width:38px;height:38px;border-radius:14px;
+  width:36px;height:36px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;background:var(--gray-bg);
+  font-size:18px;flex-shrink:0;background:var(--gray-bg);
 }
-.opt-txt{font-size:14px;font-weight:500;color:var(--gray-dark);line-height:1.4}
-.result-wrap{padding:0 20px 32px;position:relative;z-index:2}
+.opt-txt{font-size:clamp(13px,3.8vw,15px);font-weight:500;color:var(--gray-dark);line-height:1.4}
+.result-wrap{padding:0 16px 40px}
 .result-hero{
-  background:#fff;border-radius:28px;padding:28px 24px;
-  margin-bottom:14px;text-align:center;
+  background:#fff;border-radius:24px;padding:24px 20px;
+  margin-bottom:12px;text-align:center;
 }
 .r-chip{
   display:inline-block;font-size:11px;font-weight:700;
   letter-spacing:0.1em;padding:4px 14px;border-radius:20px;margin-bottom:10px;
 }
-.r-name{font-size:22px;font-weight:900;color:var(--gray-dark);margin-bottom:10px;line-height:1.3}
+.r-name{font-size:clamp(18px,5vw,22px);font-weight:900;color:var(--gray-dark);margin-bottom:10px;line-height:1.3}
 .r-desc{font-size:13px;color:#555;line-height:1.8;text-align:left}
-.traits-card{background:#fff;border-radius:24px;padding:20px;margin-bottom:12px}
+.traits-card{background:#fff;border-radius:22px;padding:18px;margin-bottom:12px}
 .traits-title{font-size:11px;font-weight:700;letter-spacing:0.12em;color:var(--gray-mid);margin-bottom:14px}
 .trait-row2{display:flex;flex-direction:column;gap:12px}
 .trait2{display:flex;align-items:center;gap:10px}
-.trait2-label{font-size:12px;color:var(--gray-dark);font-weight:500;width:60px;flex-shrink:0}
+.trait2-label{font-size:12px;color:var(--gray-dark);font-weight:500;width:58px;flex-shrink:0}
 .trait2-bar{flex:1;height:8px;background:var(--gray-bg);border-radius:4px;overflow:hidden}
 .trait2-fill{height:100%;border-radius:4px;width:0;transition:width 1.2s ease 0.3s}
-.trait2-val{font-size:11px;font-weight:700;width:30px;text-align:right;flex-shrink:0}
+.trait2-val{font-size:11px;font-weight:700;width:28px;text-align:right;flex-shrink:0}
 .trait2-low .trait2-val{color:#bbb}
 .trait2-low .trait2-label{color:#aaa}
 .trait2-note{
   font-size:11px;color:var(--gray-mid);
-  margin-top:-6px;padding-left:70px;line-height:1.5;font-style:italic;
+  margin-top:-6px;padding-left:68px;line-height:1.5;font-style:italic;
 }
-.badges2{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.badges2{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
 .badge2{
-  font-size:12px;font-weight:500;padding:5px 13px;
+  font-size:12px;font-weight:500;padding:5px 12px;
   border-radius:20px;background:var(--gray-bg);color:var(--gray-dark);
 }
 .restart{
   width:100%;padding:16px;background:var(--gray-dark);border:none;
-  border-radius:20px;font-family:'Noto Sans JP',sans-serif;
+  border-radius:18px;font-family:'Noto Sans JP',sans-serif;
   font-size:14px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:0.05em;
 }
 .restart:active{opacity:0.8}
 .fade{animation:fd 0.35s ease}
 @keyframes fd{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.start-outer{position:relative;z-index:2;padding:0 20px 40px}
+.start-outer{padding:0 16px 48px}
 .time-pill{
   display:inline-flex;align-items:center;gap:8px;
-  background:#fff;border-radius:16px;padding:10px 18px;margin-bottom:28px;
+  background:#fff;border-radius:14px;padding:10px 18px;margin-bottom:28px;
 }
 .time-pill-label{font-size:12px;font-weight:700;color:var(--gray-mid);letter-spacing:0.08em}
 .time-pill-val{font-size:14px;font-weight:900;color:var(--gray-dark)}
 .start-btn{
   width:100%;padding:18px;background:var(--gray-dark);border:none;
-  border-radius:22px;font-family:'Noto Sans JP',sans-serif;
+  border-radius:20px;font-family:'Noto Sans JP',sans-serif;
   font-size:16px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:0.05em;
 }
 .start-btn:active{opacity:0.85}
 </style>
 </head>
 <body>
-<div class="phone">
-  <div class="blob-wrap" aria-hidden="true">
-    <div class="dot-circle" style="width:72px;height:72px;background:var(--lime);top:-18px;right:28px;opacity:0.9"></div>
-    <div class="dot-circle" style="width:44px;height:44px;background:var(--pink);top:24px;left:-14px;opacity:0.8"></div>
-    <div class="dot-circle" style="width:36px;height:36px;background:var(--yellow);top:90px;right:-10px;opacity:0.85"></div>
-    <div class="dot-circle" style="width:56px;height:56px;background:var(--cyan);top:200px;left:-18px;opacity:0.7"></div>
-    <div class="dot-circle" style="width:28px;height:28px;background:var(--lime);top:310px;right:16px;opacity:0.7"></div>
-    <div class="dot-circle" style="width:48px;height:48px;background:var(--pink);top:420px;right:-14px;opacity:0.6"></div>
-    <div class="dot-circle" style="width:32px;height:32px;background:var(--yellow);top:500px;left:20px;opacity:0.7"></div>
-    <div class="dot-circle" style="width:60px;height:60px;background:var(--cyan);bottom:80px;right:-16px;opacity:0.65"></div>
-    <div class="dot-circle" style="width:38px;height:38px;background:var(--lime);bottom:160px;left:-10px;opacity:0.7"></div>
-    <div class="dot-circle" style="width:24px;height:24px;background:var(--pink);bottom:40px;left:48px;opacity:0.6"></div>
-  </div>
-  <div id="app"></div>
+
+<!-- 背景水玉（固定） -->
+<div class="blob-wrap" aria-hidden="true">
+  <div class="dot-circle" style="width:80px;height:80px;background:#C6F135;top:-20px;right:20px;opacity:0.9"></div>
+  <div class="dot-circle" style="width:50px;height:50px;background:#FF4EA1;top:30px;left:-16px;opacity:0.8"></div>
+  <div class="dot-circle" style="width:38px;height:38px;background:#FFE600;top:100px;right:-10px;opacity:0.85"></div>
+  <div class="dot-circle" style="width:60px;height:60px;background:#00E5D4;top:220px;left:-20px;opacity:0.7"></div>
+  <div class="dot-circle" style="width:30px;height:30px;background:#C6F135;top:340px;right:18px;opacity:0.7"></div>
+  <div class="dot-circle" style="width:52px;height:52px;background:#FF4EA1;top:460px;right:-16px;opacity:0.6"></div>
+  <div class="dot-circle" style="width:34px;height:34px;background:#FFE600;top:560px;left:16px;opacity:0.7"></div>
+  <div class="dot-circle" style="width:64px;height:64px;background:#00E5D4;bottom:10%;right:-18px;opacity:0.65"></div>
+  <div class="dot-circle" style="width:40px;height:40px;background:#C6F135;bottom:18%;left:-12px;opacity:0.7"></div>
+  <div class="dot-circle" style="width:26px;height:26px;background:#FF4EA1;bottom:5%;left:40px;opacity:0.6"></div>
 </div>
+
+<div id="app"></div>
 
 <script>
 const Qs=[
@@ -218,10 +234,15 @@ const Types=[
 
 const tmap=[[2,0,3,2],[0,3,1,2],[2,0,1,3],[1,0,2,3],[0,2,1,3],[0,1,2,3],[0,3,2,1]];
 let ans=[];
-const app=document.getElementById('app');
+const appEl=document.getElementById('app');
+
+function render(html){
+  appEl.innerHTML=`<div class="screen"><div class="fade">${html}</div></div>`;
+  appEl.scrollTop=0;
+}
 
 function showStart(){
-  app.innerHTML=`<div class="fade">
+  render(`
     <div class="hdr">
       <div class="app-tag">性格診断</div>
       <div class="hdr-title">あなたの本当の<br>強みを見つけよう</div>
@@ -234,15 +255,15 @@ function showStart(){
       </div>
       <button class="start-btn" onclick="showQ(0)">診断スタート</button>
     </div>
-  </div>`;
+  `);
 }
 
 function showQ(i){
   if(i>=Qs.length){showResult();return;}
   const q=Qs[i];
   const dots=Array.from({length:Qs.length},(_,k)=>`<div class="dot${k===i?' active':k<i?' done':''}"></div>`).join('');
-  app.innerHTML=`<div class="fade">
-    <div class="hdr" style="padding-top:44px;padding-bottom:12px">
+  render(`
+    <div class="hdr" style="padding-top:max(44px,calc(36px + env(safe-area-inset-top)));padding-bottom:12px">
       <div class="app-tag">性格診断</div>
     </div>
     <div class="prog-wrap"><div class="prog-dots">${dots}</div></div>
@@ -256,7 +277,7 @@ function showQ(i){
         <span class="opt-txt">${o[0]}</span>
       </button>`).join('')}
     </div>
-  </div>`;
+  `);
 }
 
 function pick(qi,oi){
@@ -271,8 +292,8 @@ function showResult(){
   const best=tally.indexOf(Math.max(...tally));
   const t=Types[best];
   const dots=Array.from({length:Qs.length},()=>`<div class="dot done"></div>`).join('');
-  app.innerHTML=`<div class="fade">
-    <div class="hdr" style="padding-top:44px;padding-bottom:12px">
+  render(`
+    <div class="hdr" style="padding-top:max(44px,calc(36px + env(safe-area-inset-top)));padding-bottom:12px">
       <div class="app-tag">診断結果</div>
     </div>
     <div class="prog-wrap"><div class="prog-dots">${dots}</div></div>
@@ -298,8 +319,7 @@ function showResult(){
       <div class="badges2">${t.badges.map(b=>`<span class="badge2">#${b}</span>`).join('')}</div>
       <button class="restart" onclick="restart()">もう一度診断する</button>
     </div>
-  </div>`;
-  // アニメーション発火
+  `);
   requestAnimationFrame(()=>{
     t.traits.forEach(tr=>{
       const el=document.getElementById('bar_'+tr[0]);
