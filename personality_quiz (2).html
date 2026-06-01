@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>性格診断 — あなたの本当の強みを見つけよう</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --lime:#C6F135;
+  --pink:#FF4EA1;
+  --cyan:#00E5D4;
+  --yellow:#FFE600;
+  --gray-bg:#F0EFEB;
+  --gray-card:#E6E5E0;
+  --gray-dark:#2A2A2A;
+  --gray-mid:#888;
+}
+html,body{
+  width:100%;
+  min-height:100%;
+  min-height: -webkit-fill-available;
+  background:var(--gray-bg);
+  font-family:'Noto Sans JP',sans-serif;
+  overflow-x:hidden;
+}
+/* 背景水玉 固定 */
+.blob-wrap{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.dot-circle{position:absolute;border-radius:50%}
+/* メインコンテンツ */
+#app{
+  position:relative;
+  z-index:1;
+  width:100%;
+  padding-bottom:env(safe-area-inset-bottom,16px);
+}
+.hdr{
+  padding: calc(env(safe-area-inset-top,0px) + 48px) 24px 20px;
+}
+.app-tag{
+  display:inline-block;font-size:11px;font-weight:700;
+  letter-spacing:0.15em;color:var(--gray-dark);
+  background:var(--lime);padding:4px 12px;border-radius:20px;margin-bottom:16px;
+}
+.hdr-title{
+  font-size:30px;font-weight:900;
+  color:var(--gray-dark);line-height:1.25;letter-spacing:-0.02em;
+}
+.hdr-sub{font-size:13px;color:var(--gray-mid);margin-top:10px;line-height:1.6}
+.prog-wrap{padding:0 24px 18px}
+.prog-dots{display:flex;gap:6px;align-items:center}
+.dot{width:8px;height:8px;border-radius:4px;background:var(--gray-card);transition:all 0.3s}
+.dot.active{width:24px;background:var(--gray-dark)}
+.dot.done{background:var(--lime)}
+.q-card{
+  margin:0 16px 14px;
+  background:#fff;border-radius:24px;
+  padding:24px 20px 22px;
+}
+.q-num{font-size:11px;font-weight:700;letter-spacing:0.15em;color:var(--gray-mid);margin-bottom:10px}
+.q-text{font-size:18px;font-weight:700;color:var(--gray-dark);line-height:1.6}
+.opts{
+  padding:0 16px 40px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.opt{
+  background:#fff;border:2px solid transparent;border-radius:18px;
+  padding:14px 18px;display:flex;align-items:center;gap:14px;
+  cursor:pointer;transition:all 0.18s;
+  font-family:'Noto Sans JP',sans-serif;text-align:left;width:100%;
+  -webkit-tap-highlight-color:transparent;
+}
+.opt:active{transform:scale(0.98)}
+.opt.sel{border-color:var(--lime);background:#f7ffe0}
+.opt-ico{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;background:var(--gray-bg);
+}
+.opt-txt{font-size:15px;font-weight:500;color:var(--gray-dark);line-height:1.4}
+/* 結果 */
+.result-wrap{padding:0 16px calc(env(safe-area-inset-bottom,16px) + 32px)}
+.result-hero{
+  background:#fff;border-radius:24px;padding:24px 20px;
+  margin-bottom:12px;text-align:center;
+}
+.r-chip{
+  display:inline-block;font-size:11px;font-weight:700;
+  letter-spacing:0.1em;padding:4px 14px;border-radius:20px;margin-bottom:10px;
+}
+.r-name{font-size:22px;font-weight:900;color:var(--gray-dark);margin-bottom:10px;line-height:1.3}
+.r-desc{font-size:13px;color:#555;line-height:1.8;text-align:left}
+.traits-card{background:#fff;border-radius:22px;padding:20px;margin-bottom:12px}
+.traits-title{font-size:11px;font-weight:700;letter-spacing:0.12em;color:var(--gray-mid);margin-bottom:14px}
+.trait-row2{display:flex;flex-direction:column;gap:12px}
+.trait2{display:flex;align-items:center;gap:10px}
+.trait2-label{font-size:12px;color:var(--gray-dark);font-weight:500;width:58px;flex-shrink:0}
+.trait2-bar{flex:1;height:8px;background:var(--gray-bg);border-radius:4px;overflow:hidden}
+.trait2-fill{height:100%;border-radius:4px;width:0;transition:width 1.2s ease 0.3s}
+.trait2-val{font-size:11px;font-weight:700;width:28px;text-align:right;flex-shrink:0}
+.trait2-low .trait2-val{color:#bbb}
+.trait2-low .trait2-label{color:#aaa}
+.trait2-note{
+  font-size:11px;color:var(--gray-mid);
+  margin-top:-6px;padding-left:68px;line-height:1.5;font-style:italic;
+}
+.badges2{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.badge2{
+  font-size:12px;font-weight:500;padding:5px 12px;
+  border-radius:20px;background:var(--gray-bg);color:var(--gray-dark);
+}
+.restart{
+  width:100%;padding:16px;background:var(--gray-dark);border:none;
+  border-radius:18px;font-family:'Noto Sans JP',sans-serif;
+  font-size:15px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:0.05em;
+  -webkit-tap-highlight-color:transparent;
+}
+.restart:active{opacity:0.8}
+.fade{animation:fd 0.35s ease}
+@keyframes fd{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* スタート画面 */
+.start-outer{padding:0 16px calc(env(safe-area-inset-bottom,16px) + 40px)}
+.time-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#fff;border-radius:14px;padding:10px 18px;margin-bottom:28px;
+}
+.time-pill-label{font-size:12px;font-weight:700;color:var(--gray-mid);letter-spacing:0.08em}
+.time-pill-val{font-size:14px;font-weight:900;color:var(--gray-dark)}
+.start-btn{
+  width:100%;padding:18px;background:var(--gray-dark);border:none;
+  border-radius:20px;font-family:'Noto Sans JP',sans-serif;
+  font-size:16px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:0.05em;
+  -webkit-tap-highlight-color:transparent;
+}
+.start-btn:active{opacity:0.85}
+</style>
+</head>
+<body>
+
+<div class="blob-wrap" aria-hidden="true">
+  <div class="dot-circle" style="width:90px;height:90px;background:#C6F135;top:-22px;right:16px;opacity:0.92"></div>
+  <div class="dot-circle" style="width:55px;height:55px;background:#FF4EA1;top:20px;left:-18px;opacity:0.85"></div>
+  <div class="dot-circle" style="width:42px;height:42px;background:#FFE600;top:110px;right:-12px;opacity:0.88"></div>
+  <div class="dot-circle" style="width:65px;height:65px;background:#00E5D4;top:240px;left:-22px;opacity:0.75"></div>
+  <div class="dot-circle" style="width:32px;height:32px;background:#C6F135;top:370px;right:14px;opacity:0.72"></div>
+  <div class="dot-circle" style="width:56px;height:56px;background:#FF4EA1;top:500px;right:-18px;opacity:0.65"></div>
+  <div class="dot-circle" style="width:36px;height:36px;background:#FFE600;top:600px;left:14px;opacity:0.72"></div>
+  <div class="dot-circle" style="width:70px;height:70px;background:#00E5D4;bottom:8%;right:-20px;opacity:0.68"></div>
+  <div class="dot-circle" style="width:44px;height:44px;background:#C6F135;bottom:16%;left:-14px;opacity:0.72"></div>
+  <div class="dot-circle" style="width:28px;height:28px;background:#FF4EA1;bottom:4%;left:36px;opacity:0.65"></div>
+</div>
+
+<div id="app"></div>
+
+<script>
+const Qs=[
+  {q:"週末、何もない自由な一日が\nあったら何をしたい？",opts:[["友人や家族と出かける","👥"],["ひとりの趣味に没頭","🎨"],["新しい場所に冒険","🗺️"],["自宅でゆっくり充電","☕"]]},
+  {q:"新しいことが始まるとき、\nあなたのやり方は？",opts:[["まずビジョンを描く","✨"],["ステップをリスト化","📋"],["感覚で試しながら進む","⚡"],["チームの意見を聞く","🤝"]]},
+  {q:"いちばん元気をもらえる瞬間は\nどんなとき？",opts:[["誰かの役に立てた","💛"],["アイデアがひらめいた","💡"],["目標をひとつ達成した","🏆"],["大切な人と深く話せた","🌙"]]},
+  {q:"ストレスを感じたとき、\nあなたの回復法は？",opts:[["体を動かして発散","🏃"],["創作に没頭して忘れる","🎵"],["信頼できる人に話す","💬"],["ひとりで静かに整理","🌿"]]},
+  {q:"あなたが大切にしている\n価値観はどれ？",opts:[["自由と冒険","🦋"],["安心と安定","🌳"],["成長と挑戦","🚀"],["調和とつながり","🌸"]]},
+  {q:"まわりからよく言われる\nあなたの強みは？",opts:[["発想力が豊か","🌟"],["粘り強く諦めない","💪"],["場をうまくまとめる","🎯"],["細かいところまで気がつく","🔍"]]},
+  {q:"夢中になれる活動といえば\nどれに近い？",opts:[["表現する（書く・描く）","🖊️"],["探求する（学ぶ・考える）","🔭"],["つながる（交流・協力）","🤲"],["達成する（競う・記録）","⚽"]]},
+];
+
+const Types=[
+  {
+    name:"クリエイティブ・ソウル",sub:"感性と創造性の持ち主",
+    chip:{bg:"#C6F135",c:"#1a3000"},
+    desc:"あなたは世界を独自の視点で捉える、生まれながらのクリエイター。豊かな感性と想像力で周りに色彩と喜びをもたらします。「つまらない」ものを美しく変容させる才能は本当に稀有なギフトです。",
+    traits:[
+      ["感受性",94,"#C6F135",false,null],
+      ["独創性",91,"#FFE600",false,null],
+      ["表現力",87,"#FF4EA1",false,null],
+      ["計画力",38,"#d0cfc9",true,"直感を大切にするぶん、計画より行動が先になりがち。それもあなたらしさ。"],
+    ],
+    badges:["直感的","芸術的","感情豊か","ユニーク"]
+  },
+  {
+    name:"エナジェティック・リーダー",sub:"行動力と影響力の持ち主",
+    chip:{bg:"#FFE600",c:"#2a1f00"},
+    desc:"どんな挑戦も恐れず前進できる、圧倒的な行動力の持ち主。その情熱とエネルギーは周囲を自然と引きつけ、チームに活力を与えます。困難な状況でも諦めない強さは多くの人の励みになっています。",
+    traits:[
+      ["行動力",96,"#FFE600",false,null],
+      ["熱量",92,"#FF4EA1",false,null],
+      ["推進力",89,"#C6F135",false,null],
+      ["慎重さ",41,"#d0cfc9",true,"動き出すスピードが速いゆえ、立ち止まって考える時間が少なめかも。"],
+    ],
+    badges:["決断力","情熱的","頼もしい","エネルギッシュ"]
+  },
+  {
+    name:"ハーモニー・メイカー",sub:"共感力と調和の持ち主",
+    chip:{bg:"#00E5D4",c:"#00312e"},
+    desc:"場の空気を読む天才で、みんなが心地よくいられる空間を自然と作り出せます。深い共感力と思いやりは周りに安心感と温かさを届けます。あなたがいるだけでチームがより豊かになると感じている人はきっと多いはず。",
+    traits:[
+      ["共感力",95,"#00E5D4",false,null],
+      ["協調性",91,"#C6F135",false,null],
+      ["思いやり",93,"#FF4EA1",false,null],
+      ["自己主張",44,"#d0cfc9",true,"周りを優先するあまり、自分の気持ちを後回しにしてしまうことも。"],
+    ],
+    badges:["温かい","聞き上手","調整力","信頼される"]
+  },
+  {
+    name:"ディープ・シンカー",sub:"洞察力と探求心の持ち主",
+    chip:{bg:"#FF4EA1",c:"#fff"},
+    desc:"物事の本質を見抜く、鋭い知性と深い洞察力を持っています。表面に見えないものまで丁寧に観察し、独自の答えを導き出す思考力は多くの場面で貴重な強みになります。その緻密な視点と真摯な姿勢は周りからひそかに尊敬されています。",
+    traits:[
+      ["分析力",95,"#FF4EA1",false,null],
+      ["洞察力",92,"#C6F135",false,null],
+      ["集中力",90,"#00E5D4",false,null],
+      ["即決力",36,"#d0cfc9",true,"深く考えるからこそ、決断に時間がかかることがある。それが丁寧さの証。"],
+    ],
+    badges:["知的好奇心","冷静","丁寧","深く考える"]
+  },
+];
+
+const tmap=[[2,0,3,2],[0,3,1,2],[2,0,1,3],[1,0,2,3],[0,2,1,3],[0,1,2,3],[0,3,2,1]];
+let ans=[];
+const appEl=document.getElementById('app');
+
+function render(html){
+  appEl.innerHTML=html;
+  window.scrollTo(0,0);
+}
+
+function showStart(){
+  render(`<div class="fade">
+    <div class="hdr">
+      <div class="app-tag">性格診断</div>
+      <div class="hdr-title">あなたの本当の<br>強みを見つけよう</div>
+      <div class="hdr-sub">7つの質問に答えるだけ。<br>あなたの個性と才能がわかります。</div>
+    </div>
+    <div class="start-outer">
+      <div class="time-pill">
+        <span class="time-pill-label">所要時間</span>
+        <span class="time-pill-val">約3分</span>
+      </div>
+      <button class="start-btn" onclick="showQ(0)">診断スタート</button>
+    </div>
+  </div>`);
+}
+
+function showQ(i){
+  if(i>=Qs.length){showResult();return;}
+  const q=Qs[i];
+  const dots=Array.from({length:Qs.length},(_,k)=>`<div class="dot${k===i?' active':k<i?' done':''}"></div>`).join('');
+  render(`<div class="fade">
+    <div class="hdr" style="padding-top:calc(env(safe-area-inset-top,0px) + 40px);padding-bottom:12px">
+      <div class="app-tag">性格診断</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-dots">${dots}</div></div>
+    <div class="q-card">
+      <div class="q-num">Q${i+1} / ${Qs.length}</div>
+      <div class="q-text">${q.q.replace('\n','<br>')}</div>
+    </div>
+    <div class="opts">
+      ${q.opts.map((o,j)=>`<button class="opt" onclick="pick(${i},${j})">
+        <span class="opt-ico">${o[1]}</span>
+        <span class="opt-txt">${o[0]}</span>
+      </button>`).join('')}
+    </div>
+  </div>`);
+}
+
+function pick(qi,oi){
+  ans[qi]=oi;
+  document.querySelectorAll('.opt')[oi].classList.add('sel');
+  setTimeout(()=>showQ(qi+1),220);
+}
+
+function showResult(){
+  const tally=[0,0,0,0];
+  ans.forEach((a,i)=>{if(tmap[i])tally[tmap[i][a]]++;});
+  const best=tally.indexOf(Math.max(...tally));
+  const t=Types[best];
+  const dots=Array.from({length:Qs.length},()=>`<div class="dot done"></div>`).join('');
+  render(`<div class="fade">
+    <div class="hdr" style="padding-top:calc(env(safe-area-inset-top,0px) + 40px);padding-bottom:12px">
+      <div class="app-tag">診断結果</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-dots">${dots}</div></div>
+    <div class="result-wrap">
+      <div class="result-hero">
+        <div><span class="r-chip" style="background:${t.chip.bg};color:${t.chip.c}">${t.sub}</span></div>
+        <div class="r-name">${t.name}</div>
+        <div class="r-desc">${t.desc}</div>
+      </div>
+      <div class="traits-card">
+        <div class="traits-title">あなたの強みスコア</div>
+        <div class="trait-row2">
+          ${t.traits.map(tr=>`
+            <div class="trait2${tr[3]?' trait2-low':''}">
+              <div class="trait2-label">${tr[0]}</div>
+              <div class="trait2-bar"><div class="trait2-fill" id="bar_${tr[0]}" style="background:${tr[2]}"></div></div>
+              <div class="trait2-val" style="color:${tr[3]?'#bbb':tr[2]}">${tr[1]}</div>
+            </div>
+            ${tr[4]?`<div class="trait2-note">${tr[4]}</div>`:''}
+          `).join('')}
+        </div>
+      </div>
+      <div class="badges2">${t.badges.map(b=>`<span class="badge2">#${b}</span>`).join('')}</div>
+      <button class="restart" onclick="restart()">もう一度診断する</button>
+    </div>
+  </div>`);
+  requestAnimationFrame(()=>{
+    t.traits.forEach(tr=>{
+      const el=document.getElementById('bar_'+tr[0]);
+      if(el) setTimeout(()=>el.style.width=tr[1]+'%',50);
+    });
+  });
+}
+
+function restart(){ans=[];showStart();}
+showStart();
+</script>
+</body>
+</html>
